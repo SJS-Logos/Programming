@@ -53,6 +53,7 @@ FILE* f = fopen(...); // API arbejder med FILE*, men skjuler definitionen
 ```
 Opaque Det har gjort det muligt at opdatere system biblioteker, uden at genoversætte de biblioteker der bruger dem.
 
+<!--
 ## Forward declaration
 
 - C++ understøtter **forward declaration** af klasser. Så længe en klasse ikke er defineret, kaldes den for **opaque**
@@ -72,3 +73,5 @@ Opaque Det har gjort det muligt at opdatere system biblioteker, uden at genovers
 
 ## Pimpl
 ## unique_ptr vs. shared_ptr
+
+->
