@@ -39,7 +39,7 @@ To af de tunge drenge fra C++ standard commitee (Herb Sutter og Scott Myers) bes
 
 ![Exceptional C++](ExceptionalCpp.png)
 
-Løsningen bliver brugt i stor stil i QT's biblioteker, og kendes idag under navnet PIMPL idiomet.
+Løsningen bliver brugt i stor stil i QT's biblioteker, og kendes idag under navnet "Pimpl" idiomet (**p**ointer to **impl**ementation). 
 
 Løsningen bruger en feature fra "C" der kaldes **opaque data type**:
 
@@ -48,28 +48,81 @@ En **opaque data type** er en type, hvor indholdet (endnu) ikke er defineret. Op
 Man kan oprette pegere til en **opaque data type** men ikke objekter af selve typen. |
 I C- og C++-standardbibliotekerne (og i mange POSIX- og systembiblioteker) møder man ofte opaque data typer, f.eks.: 
 
-```
+```c
 FILE* f = fopen(...); // API arbejder med FILE*, men skjuler definitionen
 ```
-Opaque Det har gjort det muligt at opdatere system biblioteker, uden at genoversætte de biblioteker der bruger dem.
 
-<!--
-## Forward declaration
+I C++ defineres en **opaque data type** ved
+```cpp
+struct classname;
+```
+eller
+```cpp
+class classname;
+```
 
-- C++ understøtter **forward declaration** af klasser. Så længe en klasse ikke er defineret, kaldes den for **opaque**
-  ```cpp
-  class ForwardDefinedClass; // Kun en erklæring, ingen definition 
-  class ForwardContainer {
-    private:
-    // Man kan oprette pegere til opaque definitioner
-    std::unique_ptr<ForwardDefinedClass> _forwardDefinedClassInstance;
-  };
-  
-  // cpp fil
-  µµ
-  class ForwardDefinedClass {
-      // Her kommer der kød på klassen: Den holder op med at være **opaque**
-  };
+
+**Opaque data type** har gjort det muligt at opdatere system biblioteker, uden at genoversætte de biblioteker der bruger dem.
+
+Jeg har kopieret boost's eksempel på en "Pimpl"
+
+## The "Pimpl" idiom
+A C++ specific variation of the incomplete class pattern is the "Pimpl" idiom. The incomplete class is not exposed to the user; it is hidden behind a forwarding facade. shared_ptr can be used to implement a "Pimpl":
+
+
+```cpp
+// file.hpp:
+
+class file
+{
+private:
+
+    class impl;
+    shared_ptr<impl> pimpl_;
+
+public:
+
+    file(char const * name, char const * mode);
+
+    // compiler generated members are fine and useful
+
+    void read(void * data, size_t size);
+};
+// file.cpp:
+```
+
+```cpp
+#include "file.hpp"
+
+class file::impl
+{
+private:
+
+    impl(impl const &);
+    impl & operator=(impl const &);
+
+    // private data
+
+public:
+
+    impl(char const * name, char const * mode) { ... }
+    ~impl() { ... }
+    void read(void * data, size_t size) { ... }
+};
+
+file::file(char const * name, char const * mode): pimpl_(new impl(name, mode))
+{
+}
+
+void file::read(void * data, size_t size)
+{
+    pimpl_->read(data, size);
+}
+```
+
+The key thing to note here is that the compiler-generated copy constructor, assignment operator, and destructor all have a sensible meaning. As a result, file is CopyConstructible and Assignable, allowing its use in standard containers.
+
+
 
 ## Pimpl
 ## unique_ptr vs. shared_ptr
