@@ -41,9 +41,8 @@ To af de tunge drenge fra C++ standard commitee (Herb Sutter og Scott Myers) bes
 
 Løsningen bliver brugt i stor stil i QT's biblioteker, og kendes idag under navnet "Pimpl" idiomet (**p**ointer to **impl**ementation). 
 
-Løsningen bruger en feature fra "C" der kaldes **opaque data type**:
+Løsningen bruger en feature fra C/C++ der kaldes **opaque data type**:
 
-C/C++ og **opaque data type**
 En **opaque data type** er en type, hvor indholdet (endnu) ikke er defineret. Opaque betyder "gennemsigtig". 
 Man kan oprette pegere til en **opaque data type** men ikke objekter af selve typen. |
 I C- og C++-standardbibliotekerne (og i mange POSIX- og systembiblioteker) møder man ofte opaque data typer, f.eks.: 
