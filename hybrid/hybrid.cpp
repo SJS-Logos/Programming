@@ -1,5 +1,3 @@
-#include <iostream>
-
 // Hybrid approach
 // This is a combination of the pIMPL idiom and the Abstract Interface
 // It separates concerns between the two models: 
@@ -15,10 +13,10 @@ struct IWork; // no exposure of internals - opaque
 // A simple bridge, with a dependency injected opaque IWork
 class WorkPimpl {
 public:
-    WorkPimpl(std::unique_ptr<IWork> pimpl);
+    WorkPimpl(std::shared_ptr<IWork> pimpl);
     void DoWork();
 private:
-    std::unique_ptr<IWork> pimpl_; // points to abstract interface
+    std::shared_ptr<IWork> pimpl_; // points to abstract interface
 };
 
 // IWork.h
@@ -34,6 +32,7 @@ struct IWork {
 std::unique_ptr<IWork> CreateMyWork();
 
 // MyWork.cpp
+#include <iostream>
 
 struct MyWork : IWork {
     void DoWork() override { 
@@ -50,7 +49,7 @@ std::unique_ptr<IWork> CreateMyWork()
 // WorkPimple.cpp
 // include IWork.h
 
-WorkPimpl::WorkPimpl(std::unique_ptr<IWork> pimpl) : pimpl_(std::move(pimpl)) 
+WorkPimpl::WorkPimpl(std::shared_ptr<IWork> pimpl) : pimpl_(pimpl) 
 {}
 
 void WorkPimpl::DoWork() { pimpl_->DoWork(); } // non-virtual bridge
@@ -58,6 +57,9 @@ void WorkPimpl::DoWork() { pimpl_->DoWork(); } // non-virtual bridge
 
 int main()
 {
-   WorkPimpl work(CreateMyWork());
-   work.DoWork();
+   std::shared_ptr<IWork> baseWork = CreateMyWork();
+   WorkPimpl pimplWork(baseWork);
+   pimplWork.DoWork();
+   
+   baseWork->DoWork();
 }
