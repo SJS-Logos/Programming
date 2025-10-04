@@ -16,7 +16,7 @@ public:
     WorkPimpl(std::unique_ptr<IWork> pimpl);
     void DoWork();
 private:
-    std::shared_ptr<IWork> pimpl_; // points to abstract interface
+    std::unique_ptr<IWork> pimpl_; // points to abstract interface
 };
 
 // IWork.h
