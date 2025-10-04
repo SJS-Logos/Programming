@@ -13,7 +13,7 @@ struct IWork; // no exposure of internals - opaque
 // A simple bridge, with a dependency injected opaque IWork
 class WorkPimpl {
 public:
-    WorkPimpl(std::shared_ptr<IWork> pimpl);
+    WorkPimpl(std::unique_ptr<IWork> pimpl);
     void DoWork();
 private:
     std::shared_ptr<IWork> pimpl_; // points to abstract interface
@@ -49,7 +49,7 @@ std::unique_ptr<IWork> CreateMyWork()
 // WorkPimple.cpp
 // include IWork.h
 
-WorkPimpl::WorkPimpl(std::shared_ptr<IWork> pimpl) : pimpl_(pimpl) 
+WorkPimpl::WorkPimpl(std::unique_ptr<IWork> pimpl) : pimpl_(std::move(pimpl)) 
 {}
 
 void WorkPimpl::DoWork() { pimpl_->DoWork(); } // non-virtual bridge
@@ -57,9 +57,6 @@ void WorkPimpl::DoWork() { pimpl_->DoWork(); } // non-virtual bridge
 
 int main()
 {
-   std::shared_ptr<IWork> baseWork = CreateMyWork();
-   WorkPimpl pimplWork(baseWork);
+   WorkPimpl pimplWork(CreateMyWork());
    pimplWork.DoWork();
-   
-   baseWork->DoWork();
 }
