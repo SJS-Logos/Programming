@@ -1,0 +1,19 @@
+#pragma once
+#include <memory>
+
+class {{ bridge_name }} {
+public:
+    {{ bridge_name }}();
+    ~{{ bridge_name }}();
+
+    {{ bridge_name }}({{ bridge_name }}&&) noexcept;
+    {{ bridge_name }}& operator=({{ bridge_name }}&&) noexcept;
+
+    {% for m in methods -%}
+    {{ m.return_type }} {{ m.name }}({% for p in m.params %}{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %});
+    {% endfor %}
+
+private:
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+};
