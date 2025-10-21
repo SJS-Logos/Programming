@@ -85,7 +85,7 @@ Both files will be placed in the same directory as the input header.
 
 ## 🏗️ Input Structure
 
-- This is the declaration of the abstract interface
+- This is an example of an abstract interface
 
 ```cpp
 #pragma once
@@ -104,7 +104,6 @@ class IMyInterface {
 - Defines the **bridge class** that owns a `std::unique_ptr<Interface>`.
 - Contains **non-virtual forwarding methods**.
 
-Example:
 
 ```cpp
 #pragma once

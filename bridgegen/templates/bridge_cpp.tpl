@@ -6,7 +6,6 @@
 
 {METHODS}
 
-// Factory constructor taking the real interface
 std::unique_ptr<{CLASS}> make{CLASS}(std::unique_ptr<{INTERFACE}>&& impl) {{
     return std::make_unique<{CLASS}>(std::move(impl));
 }}
