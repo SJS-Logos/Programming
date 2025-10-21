@@ -1,49 +1,91 @@
+import os
 import sys
-from clang.cindex import Index, CursorKind
-from jinja2 import Template
-from pathlib import Path
+import re
+from textwrap import indent
 
-def parse_interface(filename):
-    index = Index.create()
-    tu = index.parse(filename, args=['-x', 'c++', '-std=c++17'])
+def load_template(name):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(script_dir, "templates", name)
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
-    for cursor in tu.cursor.get_children():
-        if cursor.kind == CursorKind.CLASS_DECL and cursor.is_abstract_record():
-            methods = []
-            for m in cursor.get_children():
-                if m.kind == CursorKind.CXX_METHOD and m.is_pure_virtual_method():
-                    params = [{"name": p.spelling, "type": p.type.spelling} for p in m.get_arguments()]
-                    methods.append({
-                        "name": m.spelling,
-                        "return_type": m.result_type.spelling,
-                        "params": params,
-                        "default": "0" if m.result_type.spelling != "void" else ""
-                    })
-            return {
-                "iface_name": cursor.spelling,
-                "iface_header": Path(filename).name,
-                "bridge_name": cursor.spelling[1:] + "Bridge",
-                "methods": methods,
-            }
+def parse_interface(header_text):
+    class_match = re.search(r'class\s+(\w+)\s*\{', header_text)
+    if not class_match:
+        raise ValueError("No class found")
 
-def render_template(template_file, context):
-    tpl = Template(Path(template_file).read_text())
-    return tpl.render(context)
+    class_name = class_match.group(1)
+    method_pattern = re.compile(
+        r'virtual\s+([\w:<>&\s*]+?)\s+(\w+)\s*\(([^)]*)\)\s*(const)?\s*=\s*0\s*;'
+    )
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: bridgegen.py <interface header>")
-        return
+    methods = []
+    for match in method_pattern.finditer(header_text):
+        ret, name, args, const = match.groups()
+        methods.append((ret.strip(), name.strip(), args.strip(), bool(const)))
+    return class_name, methods
 
-    hdr = sys.argv[1]
-    info = parse_interface(hdr)
-    if not info:
-        print("No abstract interface found in", hdr)
-        return
+def format_forward_call(ret, name, args, const):
+    if args.strip():
+        arg_names = [a.strip().split()[-1] for a in args.split(',') if a.strip()]
+        call_args = ", ".join(arg_names)
+    else:
+        call_args = ""
 
-    Path(info["bridge_name"] + ".h").write_text(render_template("bridge_h.inja", info))
-    Path(info["bridge_name"] + ".cpp").write_text(render_template("bridge_cpp.inja", info))
-    print(f"Generated {info['bridge_name']}.h/.cpp")
+    if ret == "void":
+        return f"if (impl_) impl_->iface->{name}({call_args});"
+    else:
+        return f"return impl_ ? impl_->iface->{name}({call_args}) : {default_return(ret)};"
+
+def default_return(ret_type):
+    if ret_type.endswith("*") or ret_type.startswith("std::"):
+        return "{}"
+    if ret_type in ("int", "short", "long", "float", "double", "bool"):
+        return "0"
+    return "{}"
+
+def generate_files(interface_path):
+    with open(interface_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    class_name, methods = parse_interface(content)
+    bridge_name = f"{class_name}Bridge"
+
+    tpl_h = load_template("bridge_header.tpl")
+    tpl_cpp = load_template("bridge_cpp.tpl")
+
+    header_methods = []
+    cpp_methods = []
+
+    for ret, name, args, const in methods:
+        const_kw = " const" if const else ""
+        header_methods.append(f"    {ret} {name}({args}){const_kw};")
+
+        body = format_forward_call(ret, name, args, const)
+        cpp_method = f"{ret} {bridge_name}::{name}({args}){const_kw} {{\n{indent(body, '    ')}\n}}"
+        cpp_methods.append(cpp_method)
+
+    h_out = tpl_h.format(
+        CLASS=bridge_name,
+        METHODS="\n".join(header_methods)
+    )
+
+    cpp_out = tpl_cpp.format(
+        CLASS=bridge_name,
+        INTERFACE=class_name,
+        METHODS="\n\n".join(cpp_methods)
+    )
+
+    base = os.path.splitext(os.path.basename(interface_path))[0]
+    with open(f"{base}Bridge.h", "w", encoding="utf-8") as f:
+        f.write(h_out)
+    with open(f"{base}Bridge.cpp", "w", encoding="utf-8") as f:
+        f.write(cpp_out)
+
+    print(f"✅ Generated {base}Bridge.h and {base}Bridge.cpp")
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python generate_bridge.py <interface_header.h>")
+        sys.exit(1)
+    generate_files(sys.argv[1])
