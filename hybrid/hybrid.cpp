@@ -54,9 +54,20 @@ WorkPimpl::WorkPimpl(std::unique_ptr<IWork> pimpl) : pimpl_(std::move(pimpl))
 
 void WorkPimpl::DoWork() { pimpl_->DoWork(); } // non-virtual bridge
 
+// IWorkAdapter exposing the pimple bridge as a virtual injectible class
+struct IWorkAdapter: IWork 
+{
+  IWorkAdapter(std::unique_ptr<WorkPimpl> workPimpl): _workPimpl(std::move(workPimpl)) {}
+  void DoWork() { _workPimpl->DoWork(); }
+  private:
+  std::unique_ptr<WorkPimpl> _workPimpl;
+}
+
 
 int main()
 {
    WorkPimpl pimplWork(CreateMyWork());
    pimplWork.DoWork();
+   
+   IWorkAdapter WorkAdapter(std::move(pimpleWork));
 }
