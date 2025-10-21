@@ -84,7 +84,8 @@ def parse_interface(header_text):
 # ------------------------------------------------------------
 # Step 2 — Generate bridge header and source files
 # ------------------------------------------------------------
-TPL_H = """#pragma once
+TPL_H = """// Auto generated file
+#pragma once
 #include <memory>
 
 class {class_name};
@@ -102,7 +103,8 @@ private:
 std::unique_ptr<{bridge_name}> make{bridge_name}(std::unique_ptr<{class_name}>&& impl);
 """
 
-TPL_CPP = """#include "{bridge_name}.h"
+TPL_CPP = """// Auto generated file
+#include "{bridge_name}.h"
 #include "{class_name}.h"
 
 {bridge_name}::{bridge_name}(std::unique_ptr<{class_name}>&& impl)
