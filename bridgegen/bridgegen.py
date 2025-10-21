@@ -50,7 +50,7 @@ def parse_interface(header_text):
     and returns its name and body text (without braces).
     """
     # Regex to find a non-enum/struct/union class declaration
-    class_match = re.search(r'(?<!enum\s)(?<!struct\s)(?<!union\s)\bclass\s+(\w+)\s*\{', header_text)
+    class_match = re.search(r'(?<!enum\s)\bclass\s(\w+).*\s*{', header_text)
     if not class_match:
         raise ValueError("No abstract class found")
 
@@ -76,7 +76,7 @@ def parse_interface(header_text):
         })
 
     if not methods:
-        raise ValueError("No abstract class found (no pure virtual methods)")
+        raise ValueError(f"No abstract class found (no pure virtual methods) looking in {class_body}")
 
     return class_name, methods
 
