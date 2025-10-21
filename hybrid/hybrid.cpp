@@ -28,7 +28,7 @@ struct IWork {
 
 // MyWork.h
 // Factory returns abstract implementations
-// include IWork.h
+class IWork;
 std::unique_ptr<IWork> CreateMyWork();
 
 // MyWork.cpp
