@@ -33,9 +33,9 @@ def format_forward_call(ret, name, args, const):
         call_args = ""
 
     if ret == "void":
-        return f"if (impl_) impl_->iface->{name}({call_args});"
+        return f"if (impl_) impl_->{name}({call_args});"
     else:
-        return f"return impl_ ? impl_->iface->{name}({call_args}) : {default_return(ret)};"
+        return f"return impl_ ? impl_->{name}({call_args}) : {default_return(ret)};"
 
 def default_return(ret_type):
     if ret_type.endswith("*") or ret_type.startswith("std::"):
@@ -67,6 +67,7 @@ def generate_files(interface_path):
 
     h_out = tpl_h.format(
         CLASS=bridge_name,
+        INTERFACE=class_name,
         METHODS="\n".join(header_methods)
     )
 

@@ -1,17 +1,16 @@
 #pragma once
 #include <memory>
 
+class {INTERFACE};
+
 class {CLASS} {{
 public:
-    {CLASS}();
-    ~{CLASS}();
+    explicit {CLASS}(std::unique_ptr<{INTERFACE}>&& impl);
 
     {CLASS}({CLASS}&&) noexcept;
-    {CLASS}& operator=({CLASS}&&) noexcept;
 
 {METHODS}
 
 private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::unique_ptr<{INTERFACE}> impl_;
 }};

@@ -83,6 +83,20 @@ Both files will be placed in the same directory as the input header.
 
 ---
 
+## 🏗️ Input Structure
+
+- This is the declaration of the abstract interface
+
+#pragma once
+
+```cpp
+class IMyInterface {
+    public:
+    virtual void DoWork(int x) = 0;
+    virtual ~IMyInterface() = default;
+};
+```
+
 ## 🏗️ Generated Structure
 
 ### Header file (`MyInterfaceBridge.h`)
@@ -91,20 +105,23 @@ Both files will be placed in the same directory as the input header.
 - Contains **non-virtual forwarding methods**.
 
 Example:
+
 ```cpp
 #pragma once
 #include <memory>
 
-class MyInterface;
+class IMyInterface;
 
-class MyInterfaceBridge {
+class IMyInterfaceBridge {
 public:
-    MyInterfaceBridge(std::unique_ptr<MyInterface> impl);
-    ~MyInterfaceBridge();
+    explicit IMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl);
 
-    void DoSomething(int x); // forwards to impl->DoSomething(x)
+    IMyInterfaceBridge(IMyInterfaceBridge&&) noexcept;
+
+    void DoWork(int x);
+
 private:
-    std::unique_ptr<MyInterface> impl_;
+    std::unique_ptr<IMyInterface> impl_;
 };
 ```
 
@@ -114,14 +131,19 @@ private:
 
 Example:
 ```cpp
-#include "MyInterfaceBridge.h"
-#include "MyInterface.h"
+#include "IMyInterfaceBridge.h"
+#include "IMyInterface.h"
 
-MyInterfaceBridge::MyInterfaceBridge(std::unique_ptr<MyInterface> impl)
-    : impl_(std::move(impl)) {}
+IMyInterfaceBridge::IMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl) : impl_(std::move(impl)) { }
+IMyInterfaceBridge::IMyInterfaceBridge(IMyInterfaceBridge&&) noexcept = default;
 
-void MyInterfaceBridge::DoSomething(int x) {
-    impl_->DoSomething(x);
+void IMyInterfaceBridge::DoWork(int x) {
+    if (impl_) impl_->DoWork(x);
+}
+
+// Factory constructor taking the real interface
+std::unique_ptr<IMyInterfaceBridge> makeIMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl) {
+    return std::make_unique<IMyInterfaceBridge>(std::move(impl));
 }
 ```
 
