@@ -122,6 +122,9 @@ public:
 private:
     std::unique_ptr<IMyInterface> impl_;
 };
+
+// Factory constructor taking the real interface
+std::unique_ptr<IMyInterfaceBridge> makeIMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl);
 ```
 
 ### Source file (`MyInterfaceBridge.cpp`)
@@ -140,7 +143,6 @@ void IMyInterfaceBridge::DoWork(int x) {
     if (impl_) impl_->DoWork(x);
 }
 
-// Factory constructor taking the real interface
 std::unique_ptr<IMyInterfaceBridge> makeIMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl) {
     return std::make_unique<IMyInterfaceBridge>(std::move(impl));
 }
