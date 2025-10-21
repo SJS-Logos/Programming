@@ -113,7 +113,7 @@ TPL_CPP = """// Auto generated file
 {methods_impl}
 
 std::unique_ptr<{bridge_name}> make{bridge_name}(std::unique_ptr<{class_name}>&& impl) {{
-    return std::make_unique<{class_name}>(std::move(impl));
+    return std::make_unique<{bridge_name}>(std::move(impl));
 }}
 """
 
