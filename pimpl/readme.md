@@ -1,13 +1,11 @@
-# Abstrakte datatyper
-En abstrakt datatype (**ADT**) er et teoretisk begreb inden for software og datalogi, der beskriver en datatype udelukkende gennem dens operationer (hvad man kan gøre med den) og de egenskaber, disse operationer har, uden at specificere hvordan den er implementeret.
+# Abstract data types
+An abstract data type (ADT) is a theoretical concept in software and computer science that describes a data type solely through its operations (what can be done with it) and the properties of those operations, without specifying how it is implemented.
 
-En ADT definerer altså et abstrakt interface (f.eks. en stak med push, pop og peek), mens der kan findes flere forskellige konkrete implementationer (f.eks. en stak baseret på et array eller en linket liste). Implementationen kan skiftes ud uden at ændre brugen af ADT’en, så længe kontrakten for operationerne bevares.
-
+An ADT thus defines an abstract interface (e.g., a stack with push, pop, and peek), while multiple different concrete implementations may exist (e.g., a stack based on an array or a linked list). The implementation can be swapped out without changing the use of the ADT, as long as the contract for the operations is preserved.
 # Praktiske implementationer
 
-## Objektorienteret og ADT
-I objektorienteret programmering udtrykkes en ADT typisk som et **interface** eller en **abstrakt klasse**. Kontrakten beskrives gennem de metoder, som klassen stiller til rådighed, mens implementationen er gemt i en eller flere konkrete klasser.
-
+## Object oriented programming and ADT
+In object-oriented programming, an ADT is typically expressed as an **interface** or an **abstract class**. The contract is described through the methods that the class provides, while the implementation is hidden in one or more concrete classes.
 ```cpp
 struct IStream {
     virtual int read(char* buf, size_t n) = 0;
@@ -16,7 +14,7 @@ struct IStream {
 };
 ```
 
-Her vil der så være en konkret implementation f.eks.
+A concrete implemention could be:
 ```cpp
 #include <cstdio>
 
@@ -30,22 +28,21 @@ private:
 };
 ```
 
-Der er to problemer med den konkrete implementation
-- Hvis der bliver lavet ændringer i "private" delen af FStream, ændrer klassens størrelse sig.
-- Der introduceres en (skjult) afhængighed af cstdio i de moduler der bruger modulet. 
+There are two problems with the concrete implementation:
 
-Begge problemer kan føre til langsommere kompilering og større afhængighedskæder.
-To af de tunge drenge fra C++ standard commitee (Herb Sutter og Scott Myers) beskrev i bogen "Exceptional C++" hvorledes man kan gemme "afhængigheder". 
+If changes are made to the private part of FStream, the size of the class changes.
+
+A (hidden) dependency on cstdio is introduced in the modules that use the module.
+
+Both problems can lead to slower compilation and larger dependency chains.
+Two of the heavyweights from the C++ standards committee (Herb Sutter and Scott Meyers) described in the book Exceptional C++ how dependencies can be hidden.
 
 ![Exceptional C++](ExceptionalCpp.png)
 
-Løsningen bliver brugt i stor stil i QT's biblioteker, og kendes idag under navnet "Pimpl" idiomet (**p**ointer to **impl**ementation). 
+The solution is widely used in the Qt libraries and is today known as the Pimpl idiom (pointer to implementation).
 
-Løsningen bruger en feature fra C/C++ der kaldes **opaque data type**:
+The solution uses a feature from C/C++ called an opaque data type:
 
-En **opaque data type** er en type, hvor indholdet (endnu) ikke er defineret. Opaque betyder "gennemsigtig". 
-Man kan oprette pegere til en **opaque data type** men ikke objekter af selve typen. |
-I C- og C++-standardbibliotekerne (og i mange POSIX- og systembiblioteker) møder man ofte opaque data typer, f.eks.: 
 
 ```c
 FILE* f = fopen(...); // API arbejder med FILE*, men skjuler definitionen
@@ -87,10 +84,10 @@ public:
 
     void read(void * data, size_t size);
 };
-// file.cpp:
 ```
 
 ```cpp
+// file.cpp:
 #include "file.hpp"
 
 class file::impl

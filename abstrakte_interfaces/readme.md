@@ -23,7 +23,7 @@
 ## 2. Problemet med konkrete klasser i headers
 - Når vi skriver **class MyConcrete { ... }** i en header, introducerer vi:  
   - En **direkte afhængighed** til den konkrete implementering.  
-  - Større **kompilationsafhængigheder** (ændringer i implementeringen breder sig).  
+  - Større **kompilerings afhængigheder** (ændringer i implementeringen breder sig).  
   - Et implicit **brud på Open/Closed og Dependency Inversion**.
 
 - Klientkoden ender med at kende til interne detaljer, den egentlig ikke burde vide.
