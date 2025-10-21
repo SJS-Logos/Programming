@@ -87,9 +87,9 @@ Both files will be placed in the same directory as the input header.
 
 - This is the declaration of the abstract interface
 
+```cpp
 #pragma once
 
-```cpp
 class IMyInterface {
     public:
     virtual void DoWork(int x) = 0;
