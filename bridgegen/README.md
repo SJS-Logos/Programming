@@ -25,42 +25,6 @@ If not installed, download it from:
 
 ---
 
-### 2. Install Clang (for AST parsing)
-BridgeGen uses **clang’s Python bindings** (`clang.cindex`) for parsing C++ headers.
-
-#### Windows
-You can install LLVM/Clang via:
-```bash
-choco install llvm
-```
-
-Then set the `LLVM_CONFIG` environment variable if needed:
-```bash
-set LLVM_CONFIG="C:\Program Files\LLVM\bin\llvm-config.exe"
-```
-
-#### Linux / macOS
-```bash
-sudo apt install clang python3-clang
-```
-
-or
-
-```bash
-brew install llvm
-pip install clang
-```
-
----
-
-### 3. Python dependencies
-Install the required Python modules:
-```bash
-pip install clang
-```
-
----
-
 ## 🧩 Usage
 
 ### Basic syntax
@@ -114,11 +78,7 @@ class IMyInterface;
 class IMyInterfaceBridge {
 public:
     explicit IMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl);
-
-    IMyInterfaceBridge(IMyInterfaceBridge&&) noexcept;
-
     void DoWork(int x);
-
 private:
     std::unique_ptr<IMyInterface> impl_;
 };
@@ -137,7 +97,6 @@ Example:
 #include "IMyInterface.h"
 
 IMyInterfaceBridge::IMyInterfaceBridge(std::unique_ptr<IMyInterface>&& impl) : impl_(std::move(impl)) { }
-IMyInterfaceBridge::IMyInterfaceBridge(IMyInterfaceBridge&&) noexcept = default;
 
 void IMyInterfaceBridge::DoWork(int x) {
     if (impl_) impl_->DoWork(x);
