@@ -137,6 +137,7 @@ class {class_name};
 class {bridge_name} {{
 public:
     explicit {bridge_name}(std::unique_ptr<{class_name}>&& impl);
+    {bridge_name}::~{bridge_name}();
 
 {methods_decl}
 private:
@@ -159,6 +160,8 @@ TPL_CPP = """//-----------------------------------------------------------------
 
 {bridge_name}::{bridge_name}(std::unique_ptr<{class_name}>&& impl)
     : impl_(std::move(impl)) {{}}
+{bridge_name}::~{bridge_name}() = default;
+
 
 {methods_impl}
 
