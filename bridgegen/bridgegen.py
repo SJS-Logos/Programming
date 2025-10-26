@@ -99,7 +99,7 @@ TPL_H = """ //------------------------------------------------------------------
 //    - Owns a std::unique_ptr<class_name> that points to a polymorphic backend.
 //    - Exposes **non-virtual** public functions that forward to class_name’s virtuals.
 //    - Ensures ABI and vtable stability across module boundaries.
-//    - Can be instantiated via an abstract factory (Create(bridge_name)).
+//    - Can be instantiated via an abstract factory (Create{bridge_name}).
 //
 //  Example structure:
 //
