@@ -91,26 +91,26 @@ TPL_H = """ //------------------------------------------------------------------
 //  ------------------------------------
 //  The Stable Interface Bridge pattern combines three idioms:
 //
-//   • **Abstract Interface** — defines the pure virtual API contract (class_name)
+//   • **Abstract Interface** — defines the pure virtual API contract ({class_name})
 //   • **Pimpl / Opaque Pointer** — hides concrete implementation details
 //   • **Bridge (GoF)** — separates interface and implementation through indirection
 //
-//  In this design, the Bridge class (e.g. bridge_name):
-//    - Owns a std::unique_ptr<class_name> that points to a polymorphic backend.
-//    - Exposes **non-virtual** public functions that forward to class_name’s virtuals.
+//  In this design, the Bridge class (e.g. {bridge_name}):
+//    - Owns a std::unique_ptr<{class_name}> that points to a polymorphic backend.
+//    - Exposes **non-virtual** public functions that forward to {class_name}’s virtuals.
 //    - Ensures ABI and vtable stability across module boundaries.
-//    - Can be instantiated via an abstract factory (Create{bridge_name}).
+//    - Can be instantiated via an abstract factory (Create({bridge_name})).
 //
 //  Example structure:
 //
 //      +-----------------+        +---------------------+
-//      |  Client code    | -----> |  bridge_name (stable) |
-//      +-----------------+        |  owns unique_ptr<class_name> |
+//      |  Client code    | -----> |  {bridge_name} (stable) |
+//      +-----------------+        |  owns unique_ptr<{class_name}> |
 //                                  +---------------------+
 //                                                 |
 //                                                 v
 //                                        +-----------------+
-//                                        |  class_name (abstract) |
+//                                        |  {class_name} (abstract) |
 //                                        +-----------------+
 //                                                 |
 //                                                 v
